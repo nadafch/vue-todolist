@@ -1,0 +1,98 @@
+<script setup>
+import { defineProps } from 'vue';
+import { Icon } from '@iconify/vue';
+
+const props = defineProps({
+    todo: {
+        type: Object,
+        required: true,
+    },
+    index: {
+        type: Number,
+        required: true
+    }
+})
+defineEmits('toggle-complete')
+</script>
+
+<template>
+    <li>
+        <input type="checkbox" :checked="todo.isCompleted" @input="$emit('toggle-complete', index)" />
+        <div class="todo">
+            <input v-if="todo.isEditing" type="text" :value="todo.todo" />
+            <span v-else :class="{ 'completed-todos': todo.isCompleted }">{{ todo.todo }}</span>
+        </div>
+        <div class="todo-actions">
+            <Icon v-if="todo.isEditing" icon="ph:check-circle" color="#41b080" width="22" class="icon" />
+            <Icon v-else icon="ph:pencil-fill" color="#41b080" width="22" class="icon" />
+            <Icon icon="ph:trash" color="#f95e5e" width="22" class="icon" />
+        </div>
+    </li>
+</template>
+
+
+<style lang="scss" scoped>
+li {
+    background-color: rgb(245, 245, 245);
+    padding: 20px;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-radius: 20px;
+    box-shadow: 6px 10px 6px -6px rgba(0, 0, 0, 0.253);
+
+    &:hover {
+        .todo-actions {
+            opacity: 1;
+        }
+    }
+
+    input[type="checkbox"] {
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background-color: #fff;
+        border-radius: 50%;
+        box-shadow: 6px 10px 6px -6px rgba(0, 0, 0, 0.253);
+
+        &:checked {
+            background-color: #41b080;
+        }
+    }
+
+    .todo {
+        flex: 1;
+
+        input[type="text"] {
+            width: 100%;
+            padding: 4px 6px;
+            border-radius: 8px;
+            border: 1px solid black;
+
+            &:focus {
+                outline: solid #41b080;
+            }
+        }
+
+        .completed-todos {
+            text-decoration: line-through;
+        }
+
+        span {
+            margin-left: 10px;
+        }
+    }
+
+    .todo-actions {
+        display: flex;
+        gap: 6px;
+        opacity: 0;
+        transition: 150ms ease-in-out;
+
+        .icon {
+            cursor: pointer;
+        }
+    }
+}
+</style>
