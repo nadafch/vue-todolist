@@ -2,10 +2,38 @@
 import TodoCreator from "../components/TodoCreator.vue";
 import TodoItem from "../components/TodoItem.vue";
 import { Icon } from "@iconify/vue";
-import { ref } from "vue";
+import { ref, watch, computed } from "vue";
 import { uid } from "uid";
 
 const todoList = ref([]);
+
+watch(
+  todoList,
+  () => {
+    setTodoListLocalStorage();
+  },
+  {
+    deep: true,
+  }
+);
+
+const todoCompleted = computed(() => {
+  return todoList.value.every((todo) => todo.isCompleted);
+});
+
+const fetchTodoList = () => {
+  const savedTodoList = JSON.parse(localStorage.getItem("todoList"));
+
+  if (savedTodoList) {
+    todoList.value = savedTodoList;
+  }
+};
+
+fetchTodoList();
+
+const setTodoListLocalStorage = () => {
+  localStorage.setItem("todoList", JSON.stringify(todoList.value));
+};
 
 const createTodo = (todo) => {
   todoList.value.push({
@@ -30,7 +58,6 @@ const onUpdateTodo = (todoVal, todoPos) => {
 
 const toogleDeleteTodo = (todoIndex) => {
   todoList.value = todoList.value.filter((val) => val.id !== todoIndex);
-  console.log(todoList.value);
 };
 </script>
 
@@ -52,6 +79,10 @@ const toogleDeleteTodo = (todoIndex) => {
     <p v-if="todoList.length == 0" class="todos-msg">
       <Icon icon="fe:cry" width="30" />
       <span>You haven't todo's to complete! Add one!</span>
+    </p>
+    <p v-if="todoCompleted && todoList.length > 0" class="todos-msg">
+      <Icon icon="noto-v1:party-popper" />
+      <span>You have complete all your todos!</span>
     </p>
   </main>
 </template>
@@ -81,6 +112,7 @@ main {
     display: flex;
     align-items: center;
     gap: 10px;
+    margin-top: 10px;
   }
 }
 </style>
